@@ -12,24 +12,34 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 export default function App({ Component, pageProps }: any) {
   const selectionBoxRef = useRef<HTMLDivElement>(null);
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
-  const [elements, setElements] = useState<NodeListOf<HTMLElement> | null>(null);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   useEffect(() => {
+    const getAllFocusableElements = () => {
+      return Array.from(
+        document.querySelectorAll<HTMLElement>(
+          "a[href], button, input, select, textarea, [tabindex]:not([tabindex='-1']), [role='button']"
+        )
+      );
+    };
+
+    let elements = getAllFocusableElements();
+    let currentIndex = 0;
+
     const updateSelectionBox = () => {
-      if (elements && elements.length > 0 && elements[currentIndex]) {
+      if (elements.length > 0 && elements[currentIndex]) {
         const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
-          selectionBoxRef.current.style.display = "block"; // Show the selection box
+          selectionBoxRef.current.style.display = "block";
           selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
           selectionBoxRef.current.style.left = `${rect.left + window.scrollX}px`;
           selectionBoxRef.current.style.width = `${rect.width}px`;
           selectionBoxRef.current.style.height = `${rect.height}px`;
         }
         setSelectedElement(elements[currentIndex]);
+        elements[currentIndex].focus();
       } else {
         if (selectionBoxRef.current) {
-          selectionBoxRef.current.style.display = "none"; // Hide the selection box if no elements found
+          selectionBoxRef.current.style.display = "none";
         }
         setSelectedElement(null);
       }
@@ -40,35 +50,29 @@ export default function App({ Component, pageProps }: any) {
       const movementY = e.movementY;
 
       if (movementX > 0 || movementY > 0) {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % (elements?.length || 0));
+        currentIndex = (currentIndex + 1) % elements.length;
       } else if (movementX < 0 || movementY < 0) {
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + (elements?.length || 0)) % (elements?.length || 0));
+        currentIndex = (currentIndex - 1 + elements.length) % elements.length;
       }
 
       updateSelectionBox();
     };
 
-    const handleClick = () => {
-      if (selectedElement) {
-        selectedElement.click(); // Trigger click on the selected element
-      }
-    };
-
-    // Initialize elements and attach event listeners
-    const updateElements = () => {
-      setElements(document.querySelectorAll("a[href]")); // Update the list of elements
-    };
-    updateElements();
-
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("click", handleClick);
 
-    // Clean up event listeners
+    // Update elements list and selection box on DOM changes
+    const observer = new MutationObserver(() => {
+      elements = getAllFocusableElements();
+      updateSelectionBox();
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("click", handleClick);
+      observer.disconnect();
     };
-  }, [elements, currentIndex]);
+  }, []);
 
   useEffect(() => {
     Router.events.on("routeChangeStart", () => {
