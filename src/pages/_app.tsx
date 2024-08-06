@@ -12,13 +12,10 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 export default function App({ Component, pageProps }: any) {
   const selectionBoxRef = useRef<HTMLDivElement>(null);
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
-  const elements = useRef<NodeListOf<HTMLElement> | null>(null);
+  const elements = useRef<NodeListOf<HTMLElement>>(
+    document.querySelectorAll("a[href], button, input, [role='button']")
+  );
   const currentIndex = useRef<number>(0);
-
-  useEffect(() => {
-    elements.current = document.querySelectorAll("a[href], button, input, [role='button']");
-    updateSelectionBox();
-  }, []);
 
   const updateSelectionBox = () => {
     if (elements.current && elements.current.length > 0 && elements.current[currentIndex.current]) {
@@ -44,9 +41,10 @@ export default function App({ Component, pageProps }: any) {
     const movementY = e.movementY;
 
     if (movementX > 0 || movementY > 0) {
-      currentIndex.current = (currentIndex.current + 1) % (elements.current?.length || 0);
+      currentIndex.current = (currentIndex.current + 1) % elements.current.length;
     } else if (movementX < 0 || movementY < 0) {
-      currentIndex.current = (currentIndex.current - 1 + (elements.current?.length || 0)) % (elements.current?.length || 0);
+      currentIndex.current =
+        (currentIndex.current - 1 + elements.current.length) % elements.current.length;
     }
 
     updateSelectionBox();
@@ -66,7 +64,7 @@ export default function App({ Component, pageProps }: any) {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("click", handleClick);
     };
-  }, [selectedElement]);
+  }, []);
 
   useEffect(() => {
     Router.events.on("routeChangeStart", () => {
@@ -75,6 +73,9 @@ export default function App({ Component, pageProps }: any) {
 
     Router.events.on("routeChangeComplete", () => {
       NProgress.done();
+      elements.current = document.querySelectorAll("a[href], button, input, [role='button']");
+      currentIndex.current = 0; // Reset index on route change
+      updateSelectionBox(); // Update selection box on route change
     });
 
     return () => {
@@ -88,7 +89,6 @@ export default function App({ Component, pageProps }: any) {
       <Head>
         <title>Rive</title>
         <meta name="description" content="Your Personal Streaming Oasis" />
-        {/* Add other meta tags as needed */}
       </Head>
       <Layout>
         <Toaster
