@@ -58,14 +58,14 @@ export default function App({ Component, pageProps }: any) {
       updateSelectionBox();
     };
 
-    const handleMouseClick = () => {
+    const handleClick = () => {
       if (selectedElement) {
-        selectedElement.click();
+        (selectedElement as HTMLElement).click();
       }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("click", handleMouseClick);
+    window.addEventListener("click", handleClick);
 
     // Update elements list and selection box on DOM changes
     const observer = new MutationObserver(() => {
@@ -77,7 +77,7 @@ export default function App({ Component, pageProps }: any) {
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("click", handleMouseClick);
+      window.removeEventListener("click", handleClick);
       observer.disconnect();
     };
   }, [selectedElement]);
