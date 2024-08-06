@@ -1,13 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100..700&display=swap");
-// :root{
-//   --ascent-color:gold;
-//   --bg-color:rgb(27, 25, 25);
-//   --bg-gradient:rgba(49, 47, 47,0.7);
-//   --primary-1:black;
-//   --primary-2:rgb(87, 107, 135);
-//   --primary-3:rgb(164, 179, 201);
-//   --primary-4:white;
-// }
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -18,171 +9,56 @@
     --primary-2: rgb(87, 107, 135);
     --primary-3: rgb(164, 179, 201);
     --primary-4: white;
-    --watchPageBtn: var(--primary-3);
+    --watchPage-bg: rgba(23, 21, 21, 0.8);
   }
 }
+
 @media (prefers-color-scheme: light) {
   :root {
     --ascent-color: gold;
-    --bg-color: #f4f7fe;
-    --bg-gradient: rgba(238, 235, 235, 0.8);
-    --primary-1: rgb(255, 255, 255);
-    --primary-2: #64748b;
-    --primary-3: #52525b;
-    --primary-4: black;
-    --watchPageBtn: var(--primary-1);
+    --bg-color: rgb(235, 235, 235);
+    --bg-gradient: rgba(249, 249, 249, 0.8);
+    --primary-1: black;
+    --primary-2: rgb(87, 107, 135);
+    --primary-3: rgb(164, 179, 201);
+    --primary-4: white;
+    --watchPage-bg: rgba(232, 232, 232, 0.8);
   }
 }
 
-.dark {
-  // --ascent-color:gold;
-  --bg-color: rgb(27, 25, 25);
-  --bg-gradient: rgba(49, 47, 47, 0.8);
-  --primary-1: black;
-  --primary-2: rgb(87, 107, 135);
-  --primary-3: rgb(164, 179, 201);
-  --primary-4: white;
-  --watchPageBtn: var(--primary-3);
+html {
+  scroll-behavior: smooth;
 }
 
-.light {
-  // --ascent-color:gold;
-  --bg-color: #f4f7fe;
-  --bg-gradient: rgba(238, 235, 235, 0.8);
-  --primary-1: rgb(255, 255, 255);
-  --primary-2: #64748b;
-  --primary-3: #52525b;
-  --primary-4: black;
-  --watchPageBtn: var(--primary-1);
+body {
+  font-family: "Roboto Mono", monospace;
+  background: var(--bg-color);
+  color: var(--primary-4);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
-
-// .dark-mode{
-//   // --ascent-color:gold;
-//   --bg-color:rgb(27, 25, 25);
-//   --bg-gradient:rgba(49, 47, 47,0.7);
-//   --primary-1:black;
-//   --primary-2:rgb(87, 107, 135);
-//   --primary-3:rgb(164, 179, 201);
-//   --primary-4:white;
-// }
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  background-color: var(--bg-color);
-  color: var(--primary-4);
-  font-family: "Roboto Mono", monospace;
-  overflow-x: hidden;
-  transition: all 0.4s ease-in-out;
-}
-
 a {
-  color: inherit;
+  color: var(--primary-1);
   text-decoration: none;
-  cursor: pointer;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+a:hover {
+  text-decoration: underline;
 }
 
-main {
-  min-height: 100vh;
-  padding: 4rem 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-h1 {
-  margin: 0;
-  line-height: 1.15;
-  font-size: 4rem;
-  text-align: center;
-}
-
-p {
-  margin: 0;
-  text-align: center;
-  font-size: 1.5rem;
-}
-
-code {
-  background: #eee;
-  border-radius: 5px;
-  padding: 0.75rem;
-  font-size: 1.1rem;
-}
-
-.grid {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  max-width: 800px;
-}
-
-.card {
-  margin: 1rem;
-  flex-basis: 45%;
-  padding: 1.5rem;
-  text-align: left;
-  color: inherit;
-  background-color: #1a1a1a;
-  border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  border: 1px solid #eaeaea;
-  cursor: pointer;
-}
-
-.card:hover,
-.card:focus,
-.card:active {
-  border-color: var(--ascent-color);
-}
-
-.card h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
-}
-
-.card p {
-  margin: 0;
-  font-size: 1.25rem;
-  line-height: 1.5;
-}
-
-.footer {
-  display: flex;
-  flex: 1;
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea;
-  justify-content: center;
-  align-items: center;
-}
-
-.footer img {
-  margin-left: 0.5rem;
-}
-
-.footer a {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-}
-
-.focus-box {
+.selection-box {
   position: absolute;
+  width: 100px; /* Adjust width */
+  height: 50px; /* Adjust height */
   border: 2px solid var(--ascent-color);
-  pointer-events: none;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none; /* Ensure it doesn't interfere with clicks */
   z-index: 9999;
-  transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease;
 }
