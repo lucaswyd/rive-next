@@ -14,7 +14,15 @@ export default function App({ Component, pageProps }: any) {
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>("a[href]"));
+    const updateElementsList = () => {
+      return Array.from(
+        document.querySelectorAll<HTMLElement>(
+          "a[href], button, input, [tabindex], [role='button'], [data-interactive]"
+        )
+      );
+    };
+
+    let elements = updateElementsList();
     let currentIndex = 0;
 
     const updateSelectionBox = () => {
@@ -53,8 +61,17 @@ export default function App({ Component, pageProps }: any) {
 
     window.addEventListener("mousemove", handleMouseMove);
 
+    // Update elements list and selection box on route changes or dynamic content changes
+    const observer = new MutationObserver(() => {
+      elements = updateElementsList();
+      updateSelectionBox();
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      observer.disconnect();
     };
   }, []);
 
