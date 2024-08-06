@@ -15,7 +15,6 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 
 export default function App({ Component, pageProps }: any) {
   const [isLoading, setIsLoading] = useState(false);
-  const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(null);
   const selectionBoxRef = useRef<HTMLDivElement>(null);
   const lastMousePosition = useRef({ x: 0, y: 0 });
 
@@ -37,37 +36,6 @@ export default function App({ Component, pageProps }: any) {
       setIsLoading(false);
     });
   }, [Router]);
-
-  useEffect(() => {
-    // Disable context menu
-    const disableContextMenu = (event: MouseEvent) => {
-      event.preventDefault();
-      toast.info("Context Menu has been disabled");
-    };
-
-    // Disable DevTools shortcut (CTRL+SHIFT+I)
-    const disableDevToolsShortcut = (event: KeyboardEvent) => {
-      if (
-        (event.ctrlKey && event.shiftKey && event.key === "I") || // CTRL+SHIFT+I
-        (event.ctrlKey && event.shiftKey && event.key === "J") || // CTRL+SHIFT+J
-        (event.ctrlKey && event.shiftKey && event.key === "C") || // CTRL+SHIFT+C
-        event.key === "F12" // F12
-      ) {
-        event.preventDefault();
-        toast.info("Dev Tools has been disabled");
-      }
-    };
-
-    // Add event listeners
-    window.addEventListener("contextmenu", disableContextMenu);
-    window.addEventListener("keydown", disableDevToolsShortcut);
-
-    // Cleanup event listeners on unmount
-    return () => {
-      window.removeEventListener("contextmenu", disableContextMenu);
-      window.removeEventListener("keydown", disableDevToolsShortcut);
-    };
-  }, []);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -193,6 +161,8 @@ export default function App({ Component, pageProps }: any) {
             height: "100px",
             border: "2px solid red",
             pointerEvents: "none",
+            zIndex: 9999, // Ensure it's above other elements
+            background: "rgba(255, 0, 0, 0.3)", // Add some background color for visibility
           }}
         />
       </Layout>
