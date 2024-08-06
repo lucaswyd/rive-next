@@ -1,117 +1,55 @@
 import "@/styles/globals.scss";
 import Layout from "@/components/Layout";
 import Head from "next/head";
-import Script from "next/script";
-import { Toaster, toast } from "sonner";
-import "@/styles/checkbox.scss";
-import "react-tooltip/dist/react-tooltip.css";
+import { Toaster } from "sonner";
 import { Tooltip } from "react-tooltip";
 import Router from "next/router";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import NProgress from "nprogress";
-import "@/styles/nprogress.scss";
 import "react-loading-skeleton/dist/skeleton.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 export default function App({ Component, pageProps }: any) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectionBox, setSelectionBox] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
-  const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(null);
-  let lastX = 0;
-  let lastY = 0;
-
-  NProgress.configure({ showSpinner: false });
-  const GTag: any = process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID;
+  const selectionBoxRef = useRef<HTMLDivElement>(null);
+  const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    Router.events.on("routeChangeStart", () => {
-      setIsLoading(true);
-      NProgress.start();
-    });
+    let elements: NodeListOf<HTMLElement> | null = document.querySelectorAll("a[href]");
+    let currentIndex = 0;
 
-    Router.events.on("routeChangeComplete", () => {
-      setIsLoading(false);
-      NProgress.done(false);
-    });
+    console.log("Identified elements:", elements);
 
-    Router.events.on("routeChangeError", () => {
-      setIsLoading(false);
-    });
-  }, [Router]);
-
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      const xDiff = event.clientX - lastX;
-      const yDiff = event.clientY - lastY;
-
-      if (Math.abs(xDiff) > Math.abs(yDiff)) {
-        // Horizontal movement
-        if (xDiff > 0) {
-          moveBox("right");
-        } else {
-          moveBox("left");
+    const updateSelectionBox = () => {
+      if (elements && elements.length > 0 && elements[currentIndex]) {
+        const rect = elements[currentIndex].getBoundingClientRect();
+        if (selectionBoxRef.current) {
+          selectionBoxRef.current.style.display = "block"; // Show the selection box
+          selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
+          selectionBoxRef.current.style.left = `${rect.left + window.scrollX}px`;
+          selectionBoxRef.current.style.width = `${rect.width}px`;
+          selectionBoxRef.current.style.height = `${rect.height}px`;
         }
+        setSelectedElement(elements[currentIndex]);
       } else {
-        // Vertical movement
-        if (yDiff > 0) {
-          moveBox("down");
-        } else {
-          moveBox("up");
+        if (selectionBoxRef.current) {
+          selectionBoxRef.current.style.display = "none"; // Hide the selection box if no elements found
         }
+        setSelectedElement(null);
       }
-
-      lastX = event.clientX;
-      lastY = event.clientY;
     };
 
-    const moveBox = (direction: "up" | "down" | "left" | "right") => {
-      if (focusedElement) {
-        const elements = Array.from(document.querySelectorAll("a, button, [href]")).filter(el => el !== focusedElement) as HTMLElement[];
+    const handleMouseMove = (e: MouseEvent) => {
+      const movementX = e.movementX;
+      const movementY = e.movementY;
 
-        const { top, left, right, bottom } = focusedElement.getBoundingClientRect();
-
-        let closestElement: HTMLElement | null = null;
-        let minDistance = Infinity;
-
-        elements.forEach(el => {
-          const rect = el.getBoundingClientRect();
-          let distance = Infinity;
-
-          switch (direction) {
-            case "right":
-              if (rect.left > right) {
-                distance = rect.left - right;
-              }
-              break;
-            case "left":
-              if (rect.right < left) {
-                distance = left - rect.right;
-              }
-              break;
-            case "down":
-              if (rect.top > bottom) {
-                distance = rect.top - bottom;
-              }
-              break;
-            case "up":
-              if (rect.bottom < top) {
-                distance = top - rect.bottom;
-              }
-              break;
-          }
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestElement = el;
-          }
-        });
-
-        if (closestElement) {
-          setFocusedElement(closestElement);
-          const { top, left } = (closestElement as HTMLElement).getBoundingClientRect();
-          setSelectionBox({ top, left });
-        }
+      // Adjust the detection logic for movement direction
+      if (movementX > 0 || movementY > 0) {
+        currentIndex = (currentIndex + 1) % (elements?.length || 0);
+      } else if (movementX < 0 || movementY < 0) {
+        currentIndex = (currentIndex - 1 + (elements?.length || 0)) % (elements?.length || 0);
       }
+
+      updateSelectionBox();
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -119,32 +57,20 @@ export default function App({ Component, pageProps }: any) {
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [focusedElement]);
+  }, []);
 
   useEffect(() => {
-    const disableContextMenu = (event: MouseEvent) => {
-      event.preventDefault();
-      toast.info("Context Menu has been disabled");
-    };
+    Router.events.on("routeChangeStart", () => {
+      NProgress.start();
+    });
 
-    const disableDevToolsShortcut = (event: KeyboardEvent) => {
-      if (
-        (event.ctrlKey && event.shiftKey && event.key === "I") ||
-        (event.ctrlKey && event.shiftKey && event.key === "J") ||
-        (event.ctrlKey && event.shiftKey && event.key === "C") ||
-        event.key === "F12"
-      ) {
-        event.preventDefault();
-        toast.info("Dev Tools has been disabled");
-      }
-    };
-
-    window.addEventListener("contextmenu", disableContextMenu);
-    window.addEventListener("keydown", disableDevToolsShortcut);
+    Router.events.on("routeChangeComplete", () => {
+      NProgress.done();
+    });
 
     return () => {
-      window.removeEventListener("contextmenu", disableContextMenu);
-      window.removeEventListener("keydown", disableDevToolsShortcut);
+      Router.events.off("routeChangeStart", () => NProgress.start());
+      Router.events.off("routeChangeComplete", () => NProgress.done());
     };
   }, []);
 
@@ -153,62 +79,7 @@ export default function App({ Component, pageProps }: any) {
       <Head>
         <title>Rive</title>
         <meta name="description" content="Your Personal Streaming Oasis" />
-        <meta
-          name="keywords"
-          content="movie, streaming, tv, rive, stream. movie app, tv shows, movie download"
-        />
-        <meta
-          name="google-site-verification"
-          content="J0QUeScQSxufPJqGTaszgnI35U2jN98vVWSOkVR4HrI"
-        />
-        <link rel="manifest" href="manifest.json" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#f4f7fe" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Rive" />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="192x192"
-          href="/icons/icon-192x192.png"
-        />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="msapplication-tap-highlight" content="no" />
-        <link rel="shortcut icon" href="/images/logo512.png" />
-        <link rel="apple-touch-startup-image" href="/images/logo512.svg" />
-
-        {/* Open Graph Meta Tags */}
-        <meta property="og:title" content="Rive" />
-        <meta
-          property="og:description"
-          content="Your Personal Streaming Oasis"
-        />
-        <meta
-          property="og:image"
-          content="https://rivestream.live/images/MeatImage.jpg"
-        />
-        <meta property="og:url" content="https://rivestream.live" />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Rive" />
-
-        {/* Twitter Card Meta Tags */}
-        <meta
-          name="twitter:card"
-          content="https://rivestream.live/images/MeatImage.jpg"
-        />
-        <meta property="twitter:domain" content="rivestream.live" />
-        <meta property="twitter:url" content="https://rivestream.live" />
-        <meta name="twitter:title" content="Rive" />
-        <meta
-          name="twitter:description"
-          content="Your Personal Streaming Oasis"
-        />
-        <meta
-          name="twitter:image"
-          content="https://rivestream.live/images/MeatImage.jpg"
-        />
+        {/* Add other meta tags as needed */}
       </Head>
       <Layout>
         <Toaster
@@ -216,7 +87,6 @@ export default function App({ Component, pageProps }: any) {
             className: "sooner-toast-desktop",
           }}
           position="bottom-right"
-          expand={true}
         />
         <Toaster
           toastOptions={{
@@ -226,18 +96,9 @@ export default function App({ Component, pageProps }: any) {
         />
         <Tooltip id="tooltip" className="react-tooltip" />
         <Component {...pageProps} />
-        {focusedElement && (
-          <div
-            className="selection-box"
-            style={{ top: `${selectionBox.top}px`, left: `${selectionBox.left}px` }}
-          />
-        )}
       </Layout>
-      <GoogleAnalytics gaId={GTag} />
-      <Script
-        disable-devtool-auto
-        src="https://cdn.jsdelivr.net/npm/disable-devtool"
-      />
+      <div ref={selectionBoxRef} className="selection-box" />
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID || ""} />
     </>
   );
 }
