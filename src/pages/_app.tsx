@@ -12,11 +12,11 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 export default function App({ Component, pageProps }: any) {
   const selectionBoxRef = useRef<HTMLDivElement>(null);
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
-  const elements = useRef<NodeListOf<HTMLElement> | null>(null);
+  const elements = useRef<HTMLElement[]>([]);
   const currentIndex = useRef<number>(0);
 
   const updateSelectionBox = () => {
-    if (elements.current && elements.current.length > 0 && elements.current[currentIndex.current]) {
+    if (elements.current.length > 0 && elements.current[currentIndex.current]) {
       const rect = elements.current[currentIndex.current].getBoundingClientRect();
       if (selectionBoxRef.current) {
         selectionBoxRef.current.style.display = "block";
@@ -39,9 +39,9 @@ export default function App({ Component, pageProps }: any) {
     const movementY = e.movementY;
 
     if (movementX > 0 || movementY > 0) {
-      currentIndex.current = (currentIndex.current + 1) % (elements.current?.length || 0);
+      currentIndex.current = (currentIndex.current + 1) % elements.current.length;
     } else if (movementX < 0 || movementY < 0) {
-      currentIndex.current = (currentIndex.current - 1 + (elements.current?.length || 0)) % (elements.current?.length || 0);
+      currentIndex.current = (currentIndex.current - 1 + elements.current.length) % elements.current.length;
     }
 
     updateSelectionBox();
@@ -55,32 +55,41 @@ export default function App({ Component, pageProps }: any) {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      elements.current = document.querySelectorAll("a[href], button, input, [role='button']");
-      updateSelectionBox();
+      // Update elements on client-side
+      const updateElements = () => {
+        elements.current = Array.from(document.querySelectorAll("a[href], button, input, [role='button']"));
+        currentIndex.current = 0;
+        updateSelectionBox();
+      };
 
+      // Initialize elements and add event listeners
+      updateElements();
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("click", handleClick);
+
+      // Handle route change
+      Router.events.on("routeChangeComplete", updateElements);
 
       return () => {
         window.removeEventListener("mousemove", handleMouseMove);
         window.removeEventListener("click", handleClick);
+        Router.events.off("routeChangeComplete", updateElements);
       };
     }
   }, []);
 
   useEffect(() => {
-    const handleRouteChange = () => {
-      if (typeof window !== 'undefined') {
-        elements.current = document.querySelectorAll("a[href], button, input, [role='button']");
-        currentIndex.current = 0;
-        updateSelectionBox();
-      }
-    };
+    Router.events.on("routeChangeStart", () => {
+      NProgress.start();
+    });
 
-    Router.events.on("routeChangeComplete", handleRouteChange);
+    Router.events.on("routeChangeComplete", () => {
+      NProgress.done();
+    });
 
     return () => {
-      Router.events.off("routeChangeComplete", handleRouteChange);
+      Router.events.off("routeChangeStart", () => NProgress.start());
+      Router.events.off("routeChangeComplete", () => NProgress.done());
     };
   }, []);
 
