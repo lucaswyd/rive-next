@@ -18,10 +18,9 @@ const FocusBox = () => {
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
-      const allHrefElements = Array.from(document.querySelectorAll("[href]"));
+      const allHrefElements = Array.from(document.querySelectorAll<HTMLElement>("[href]"));
       if (allHrefElements.length === 0) return;
 
-      // Determine closest element in the direction of movement
       const mouseX = event.clientX;
       const mouseY = event.clientY;
 
@@ -36,7 +35,7 @@ const FocusBox = () => {
 
         if (distance < closestDistance) {
           closestDistance = distance;
-          closestElement = element as HTMLElement;
+          closestElement = element;
         }
       });
 
@@ -91,30 +90,26 @@ export default function App({ Component, pageProps }: any) {
   }, [Router]);
 
   useEffect(() => {
-    // Disable context menu
     const disableContextMenu = (event: MouseEvent) => {
       event.preventDefault();
       toast.info("Context Menu has been disabled");
     };
 
-    // Disable DevTools shortcut (CTRL+SHIFT+I)
     const disableDevToolsShortcut = (event: KeyboardEvent) => {
       if (
-        (event.ctrlKey && event.shiftKey && event.key === "I") || // CTRL+SHIFT+I
-        (event.ctrlKey && event.shiftKey && event.key === "J") || // CTRL+SHIFT+J
-        (event.ctrlKey && event.shiftKey && event.key === "C") || // CTRL+SHIFT+C
-        event.key === "F12" // F12
+        (event.ctrlKey && event.shiftKey && event.key === "I") ||
+        (event.ctrlKey && event.shiftKey && event.key === "J") ||
+        (event.ctrlKey && event.shiftKey && event.key === "C") ||
+        event.key === "F12"
       ) {
         event.preventDefault();
         toast.info("Dev Tools has been disabled");
       }
     };
 
-    // Add event listeners
     window.addEventListener("contextmenu", disableContextMenu);
     window.addEventListener("keydown", disableDevToolsShortcut);
 
-    // Cleanup event listeners on unmount
     return () => {
       window.removeEventListener("contextmenu", disableContextMenu);
       window.removeEventListener("keydown", disableDevToolsShortcut);
