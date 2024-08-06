@@ -13,13 +13,67 @@ import "@/styles/nprogress.scss";
 import "react-loading-skeleton/dist/skeleton.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
+const FocusBox = () => {
+  const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      const allHrefElements = Array.from(document.querySelectorAll("[href]"));
+      if (allHrefElements.length === 0) return;
+
+      // Determine closest element in the direction of movement
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+
+      let closestElement: HTMLElement | null = null;
+      let closestDistance = Infinity;
+
+      allHrefElements.forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        const distance = Math.sqrt(
+          Math.pow(rect.left - mouseX, 2) + Math.pow(rect.top - mouseY, 2)
+        );
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestElement = element as HTMLElement;
+        }
+      });
+
+      if (closestElement) {
+        setFocusedElement(closestElement);
+        closestElement.focus();
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  return focusedElement ? (
+    <div
+      className="focus-box"
+      style={{
+        position: "absolute",
+        left: focusedElement.getBoundingClientRect().left,
+        top: focusedElement.getBoundingClientRect().top,
+        width: focusedElement.getBoundingClientRect().width,
+        height: focusedElement.getBoundingClientRect().height,
+        border: "2px solid #fff", // Customize border style
+        pointerEvents: "none",
+        zIndex: 9999,
+      }}
+    />
+  ) : null;
+};
+
 export default function App({ Component, pageProps }: any) {
   const [isLoading, setIsLoading] = useState(false);
   NProgress.configure({ showSpinner: false });
   const GTag: any = process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID;
-  // NProgress.configure({
-  //   template: '<div class="bar" role="bar"><div class="peg"></div></div>'
-  // });
+
   useEffect(() => {
     Router.events.on("routeChangeStart", (url) => {
       setIsLoading(true);
@@ -86,7 +140,6 @@ export default function App({ Component, pageProps }: any) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Rive" />
-        {/* <link rel="icon" type="image/svg+xml" href="/images/logo512.svg" color="#f4f7fe" /> */}
         <link
           rel="icon"
           type="image/png"
@@ -95,7 +148,6 @@ export default function App({ Component, pageProps }: any) {
         />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <meta name="mobile-web-app-capable" content="yes" />
-        {/* <meta name="msapplication-TileColor" content="#f4f7fe" /> */}
         <meta name="msapplication-tap-highlight" content="no" />
         <link rel="shortcut icon" href="/images/logo512.png" />
         <link rel="apple-touch-startup-image" href="/images/logo512.svg" />
@@ -148,6 +200,7 @@ export default function App({ Component, pageProps }: any) {
         <Tooltip id="tooltip" className="react-tooltip" />
         <Component {...pageProps} />
       </Layout>
+      <FocusBox />
       <GoogleAnalytics gaId={GTag} />
       <Script
         disable-devtool-auto
