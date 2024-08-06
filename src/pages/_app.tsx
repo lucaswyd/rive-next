@@ -30,7 +30,8 @@ const FocusBox = () => {
       allHrefElements.forEach((element) => {
         const rect = element.getBoundingClientRect();
         const distance = Math.sqrt(
-          Math.pow(rect.left - mouseX, 2) + Math.pow(rect.top - mouseY, 2)
+          Math.pow(rect.left + rect.width / 2 - mouseX, 2) + // Center X of the element
+          Math.pow(rect.top + rect.height / 2 - mouseY, 2) // Center Y of the element
         );
 
         if (distance < closestDistance) {
@@ -41,7 +42,7 @@ const FocusBox = () => {
 
       if (closestElement) {
         setFocusedElement(closestElement);
-        closestElement.focus();
+        (closestElement as HTMLElement).focus(); // Explicit cast to HTMLElement
       }
     };
 
