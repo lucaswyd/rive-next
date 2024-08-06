@@ -24,17 +24,17 @@ export default function App({ Component, pageProps }: any) {
   const GTag: any = process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID;
 
   useEffect(() => {
-    Router.events.on("routeChangeStart", (url) => {
+    Router.events.on("routeChangeStart", () => {
       setIsLoading(true);
       NProgress.start();
     });
 
-    Router.events.on("routeChangeComplete", (url) => {
+    Router.events.on("routeChangeComplete", () => {
       setIsLoading(false);
       NProgress.done(false);
     });
 
-    Router.events.on("routeChangeError", (url) => {
+    Router.events.on("routeChangeError", () => {
       setIsLoading(false);
     });
   }, [Router]);
@@ -108,7 +108,7 @@ export default function App({ Component, pageProps }: any) {
 
         if (closestElement) {
           setFocusedElement(closestElement);
-          const { top, left } = closestElement.getBoundingClientRect();
+          const { top, left } = (closestElement as HTMLElement).getBoundingClientRect();
           setSelectionBox({ top, left });
         }
       }
