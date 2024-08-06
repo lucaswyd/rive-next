@@ -58,7 +58,14 @@ export default function App({ Component, pageProps }: any) {
       updateSelectionBox();
     };
 
+    const handleMouseClick = () => {
+      if (selectedElement) {
+        selectedElement.click();
+      }
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("click", handleMouseClick);
 
     // Update elements list and selection box on DOM changes
     const observer = new MutationObserver(() => {
@@ -70,9 +77,10 @@ export default function App({ Component, pageProps }: any) {
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("click", handleMouseClick);
       observer.disconnect();
     };
-  }, []);
+  }, [selectedElement]);
 
   useEffect(() => {
     Router.events.on("routeChangeStart", () => {
