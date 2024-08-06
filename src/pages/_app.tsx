@@ -14,25 +14,24 @@ export default function App({ Component, pageProps }: any) {
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    let elements: NodeListOf<HTMLElement> | null = document.querySelectorAll("a[href]");
+    const elements = Array.from(document.querySelectorAll<HTMLElement>("a[href]"));
     let currentIndex = 0;
 
-    console.log("Identified elements:", elements);
-
     const updateSelectionBox = () => {
-      if (elements && elements.length > 0 && elements[currentIndex]) {
+      if (elements.length > 0 && elements[currentIndex]) {
         const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
-          selectionBoxRef.current.style.display = "block"; // Show the selection box
+          selectionBoxRef.current.style.display = "block";
           selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
           selectionBoxRef.current.style.left = `${rect.left + window.scrollX}px`;
           selectionBoxRef.current.style.width = `${rect.width}px`;
           selectionBoxRef.current.style.height = `${rect.height}px`;
         }
         setSelectedElement(elements[currentIndex]);
+        elements[currentIndex].focus();
       } else {
         if (selectionBoxRef.current) {
-          selectionBoxRef.current.style.display = "none"; // Hide the selection box if no elements found
+          selectionBoxRef.current.style.display = "none";
         }
         setSelectedElement(null);
       }
@@ -42,11 +41,11 @@ export default function App({ Component, pageProps }: any) {
       const movementX = e.movementX;
       const movementY = e.movementY;
 
-      // Adjust the detection logic for movement direction
+      // Determine the direction of movement and update the index
       if (movementX > 0 || movementY > 0) {
-        currentIndex = (currentIndex + 1) % (elements?.length || 0);
+        currentIndex = (currentIndex + 1) % elements.length;
       } else if (movementX < 0 || movementY < 0) {
-        currentIndex = (currentIndex - 1 + (elements?.length || 0)) % (elements?.length || 0);
+        currentIndex = (currentIndex - 1 + elements.length) % elements.length;
       }
 
       updateSelectionBox();
