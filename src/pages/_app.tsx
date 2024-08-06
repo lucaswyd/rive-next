@@ -7,7 +7,7 @@ import "@/styles/checkbox.scss";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
 import Router from "next/router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import NProgress from "nprogress";
 import "@/styles/nprogress.scss";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -15,83 +15,136 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 
 export default function App({ Component, pageProps }: any) {
   const [isLoading, setIsLoading] = useState(false);
+  const [selectionBox, setSelectionBox] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(null);
-  const selectionBoxRef = useRef<HTMLDivElement>(null);
-  const lastMousePosition = useRef({ x: 0, y: 0 });
-  const isMovingBox = useRef(false);
+  let lastX = 0;
+  let lastY = 0;
 
   NProgress.configure({ showSpinner: false });
   const GTag: any = process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID;
 
   useEffect(() => {
-    Router.events.on("routeChangeStart", () => {
+    Router.events.on("routeChangeStart", (url) => {
       setIsLoading(true);
       NProgress.start();
     });
 
-    Router.events.on("routeChangeComplete", () => {
+    Router.events.on("routeChangeComplete", (url) => {
       setIsLoading(false);
       NProgress.done(false);
     });
 
-    Router.events.on("routeChangeError", () => {
+    Router.events.on("routeChangeError", (url) => {
       setIsLoading(false);
     });
   }, [Router]);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
-      if (isMovingBox.current && selectionBoxRef.current) {
-        const { clientX: x, clientY: y } = event;
-        const dx = x - lastMousePosition.current.x;
-        const dy = y - lastMousePosition.current.y;
+      const xDiff = event.clientX - lastX;
+      const yDiff = event.clientY - lastY;
 
-        lastMousePosition.current = { x, y };
-
-        const box = selectionBoxRef.current;
-        const rect = box.getBoundingClientRect();
-        box.style.left = `${rect.left + dx}px`;
-        box.style.top = `${rect.top + dy}px`;
+      if (Math.abs(xDiff) > Math.abs(yDiff)) {
+        // Horizontal movement
+        if (xDiff > 0) {
+          moveBox("right");
+        } else {
+          moveBox("left");
+        }
+      } else {
+        // Vertical movement
+        if (yDiff > 0) {
+          moveBox("down");
+        } else {
+          moveBox("up");
+        }
       }
+
+      lastX = event.clientX;
+      lastY = event.clientY;
     };
 
-    const handleMouseDown = (event: MouseEvent) => {
-      const box = selectionBoxRef.current;
-      if (box) {
-        const element = document.elementFromPoint(event.clientX, event.clientY);
-        if (element && (element as HTMLElement).hasAttribute("href")) {
-          setFocusedElement(element as HTMLElement);
-          box.style.width = `${element.clientWidth}px`;
-          box.style.height = `${element.clientHeight}px`;
-          const rect = element.getBoundingClientRect();
-          box.style.left = `${rect.left}px`;
-          box.style.top = `${rect.top}px`;
-          isMovingBox.current = true;
+    const moveBox = (direction: "up" | "down" | "left" | "right") => {
+      if (focusedElement) {
+        const elements = Array.from(document.querySelectorAll("a, button, [href]")).filter(el => el !== focusedElement) as HTMLElement[];
+
+        const { top, left, right, bottom } = focusedElement.getBoundingClientRect();
+
+        let closestElement: HTMLElement | null = null;
+        let minDistance = Infinity;
+
+        elements.forEach(el => {
+          const rect = el.getBoundingClientRect();
+          let distance = Infinity;
+
+          switch (direction) {
+            case "right":
+              if (rect.left > right) {
+                distance = rect.left - right;
+              }
+              break;
+            case "left":
+              if (rect.right < left) {
+                distance = left - rect.right;
+              }
+              break;
+            case "down":
+              if (rect.top > bottom) {
+                distance = rect.top - bottom;
+              }
+              break;
+            case "up":
+              if (rect.bottom < top) {
+                distance = top - rect.bottom;
+              }
+              break;
+          }
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestElement = el;
+          }
+        });
+
+        if (closestElement) {
+          setFocusedElement(closestElement);
+          const { top, left } = closestElement.getBoundingClientRect();
+          setSelectionBox({ top, left });
         }
       }
     };
 
-    const handleMouseUp = () => {
-      isMovingBox.current = false;
-    };
-
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mousedown", handleMouseDown);
-      window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, []);
+  }, [focusedElement]);
 
   useEffect(() => {
-    // Hide the cursor
-    document.body.style.cursor = "none";
+    const disableContextMenu = (event: MouseEvent) => {
+      event.preventDefault();
+      toast.info("Context Menu has been disabled");
+    };
+
+    const disableDevToolsShortcut = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey && event.shiftKey && event.key === "I") ||
+        (event.ctrlKey && event.shiftKey && event.key === "J") ||
+        (event.ctrlKey && event.shiftKey && event.key === "C") ||
+        event.key === "F12"
+      ) {
+        event.preventDefault();
+        toast.info("Dev Tools has been disabled");
+      }
+    };
+
+    window.addEventListener("contextmenu", disableContextMenu);
+    window.addEventListener("keydown", disableDevToolsShortcut);
 
     return () => {
-      document.body.style.cursor = "auto";
+      window.removeEventListener("contextmenu", disableContextMenu);
+      window.removeEventListener("keydown", disableDevToolsShortcut);
     };
   }, []);
 
@@ -173,21 +226,12 @@ export default function App({ Component, pageProps }: any) {
         />
         <Tooltip id="tooltip" className="react-tooltip" />
         <Component {...pageProps} />
-        <div
-          ref={selectionBoxRef}
-          className="selection-box"
-          style={{
-            position: "fixed",
-            width: "100px",
-            height: "100px",
-            border: "2px solid red",
-            pointerEvents: "none",
-            zIndex: 9999, // Ensure it's above other elements
-            background: "rgba(255, 0, 0, 0.3)", // Add some background color for visibility
-            top: 0,
-            left: 0,
-          }}
-        />
+        {focusedElement && (
+          <div
+            className="selection-box"
+            style={{ top: `${selectionBox.top}px`, left: `${selectionBox.left}px` }}
+          />
+        )}
       </Layout>
       <GoogleAnalytics gaId={GTag} />
       <Script
