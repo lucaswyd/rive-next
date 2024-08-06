@@ -22,17 +22,17 @@ export default function App({ Component, pageProps }: any) {
   const GTag: any = process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID;
 
   useEffect(() => {
-    Router.events.on("routeChangeStart", (url) => {
+    Router.events.on("routeChangeStart", () => {
       setIsLoading(true);
       NProgress.start();
     });
 
-    Router.events.on("routeChangeComplete", (url) => {
+    Router.events.on("routeChangeComplete", () => {
       setIsLoading(false);
       NProgress.done(false);
     });
 
-    Router.events.on("routeChangeError", (url) => {
+    Router.events.on("routeChangeError", () => {
       setIsLoading(false);
     });
   }, [Router]);
@@ -62,15 +62,10 @@ export default function App({ Component, pageProps }: any) {
 
   useEffect(() => {
     // Hide the cursor
-    const body = document.querySelector("body");
-    if (body) {
-      body.style.cursor = "none";
-    }
+    document.body.style.cursor = "none";
 
     return () => {
-      if (body) {
-        body.style.cursor = "auto";
-      }
+      document.body.style.cursor = "auto";
     };
   }, []);
 
@@ -156,13 +151,15 @@ export default function App({ Component, pageProps }: any) {
           ref={selectionBoxRef}
           className="selection-box"
           style={{
-            position: "absolute",
+            position: "fixed",
             width: "100px",
             height: "100px",
             border: "2px solid red",
             pointerEvents: "none",
             zIndex: 9999, // Ensure it's above other elements
             background: "rgba(255, 0, 0, 0.3)", // Add some background color for visibility
+            top: 0,
+            left: 0,
           }}
         />
       </Layout>
