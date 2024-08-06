@@ -7,70 +7,18 @@ import "@/styles/checkbox.scss";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
 import Router from "next/router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import NProgress from "nprogress";
 import "@/styles/nprogress.scss";
 import "react-loading-skeleton/dist/skeleton.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
-const FocusBox = () => {
-  const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      const allHrefElements = Array.from(document.querySelectorAll<HTMLElement>("[href]"));
-      if (allHrefElements.length === 0) return;
-
-      const mouseX = event.clientX;
-      const mouseY = event.clientY;
-
-      let closestElement: HTMLElement | null = null;
-      let closestDistance = Infinity;
-
-      allHrefElements.forEach((element) => {
-        const rect = element.getBoundingClientRect();
-        const distance = Math.sqrt(
-          Math.pow(rect.left + rect.width / 2 - mouseX, 2) + // Center X of the element
-          Math.pow(rect.top + rect.height / 2 - mouseY, 2) // Center Y of the element
-        );
-
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestElement = element;
-        }
-      });
-
-      if (closestElement) {
-        setFocusedElement(closestElement);
-        (closestElement as HTMLElement).focus(); // Explicit cast to HTMLElement
-      }
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
-
-  return focusedElement ? (
-    <div
-      className="focus-box"
-      style={{
-        position: "absolute",
-        left: focusedElement.getBoundingClientRect().left,
-        top: focusedElement.getBoundingClientRect().top,
-        width: focusedElement.getBoundingClientRect().width,
-        height: focusedElement.getBoundingClientRect().height,
-        border: "2px solid #fff", // Customize border style
-        pointerEvents: "none",
-        zIndex: 9999,
-      }}
-    />
-  ) : null;
-};
-
 export default function App({ Component, pageProps }: any) {
   const [isLoading, setIsLoading] = useState(false);
+  const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(null);
+  const selectionBoxRef = useRef<HTMLDivElement>(null);
+  const lastMousePosition = useRef({ x: 0, y: 0 });
+
   NProgress.configure({ showSpinner: false });
   const GTag: any = process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID;
 
@@ -91,29 +39,70 @@ export default function App({ Component, pageProps }: any) {
   }, [Router]);
 
   useEffect(() => {
+    // Disable context menu
     const disableContextMenu = (event: MouseEvent) => {
       event.preventDefault();
       toast.info("Context Menu has been disabled");
     };
 
+    // Disable DevTools shortcut (CTRL+SHIFT+I)
     const disableDevToolsShortcut = (event: KeyboardEvent) => {
       if (
-        (event.ctrlKey && event.shiftKey && event.key === "I") ||
-        (event.ctrlKey && event.shiftKey && event.key === "J") ||
-        (event.ctrlKey && event.shiftKey && event.key === "C") ||
-        event.key === "F12"
+        (event.ctrlKey && event.shiftKey && event.key === "I") || // CTRL+SHIFT+I
+        (event.ctrlKey && event.shiftKey && event.key === "J") || // CTRL+SHIFT+J
+        (event.ctrlKey && event.shiftKey && event.key === "C") || // CTRL+SHIFT+C
+        event.key === "F12" // F12
       ) {
         event.preventDefault();
         toast.info("Dev Tools has been disabled");
       }
     };
 
+    // Add event listeners
     window.addEventListener("contextmenu", disableContextMenu);
     window.addEventListener("keydown", disableDevToolsShortcut);
 
+    // Cleanup event listeners on unmount
     return () => {
       window.removeEventListener("contextmenu", disableContextMenu);
       window.removeEventListener("keydown", disableDevToolsShortcut);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      const box = selectionBoxRef.current;
+      if (box) {
+        const { clientX: x, clientY: y } = event;
+        const dx = x - lastMousePosition.current.x;
+        const dy = y - lastMousePosition.current.y;
+
+        lastMousePosition.current = { x, y };
+
+        const rect = box.getBoundingClientRect();
+        box.style.left = `${rect.left + dx}px`;
+        box.style.top = `${rect.top + dy}px`;
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Hide the cursor
+    const body = document.querySelector("body");
+    if (body) {
+      body.style.cursor = "none";
+    }
+
+    return () => {
+      if (body) {
+        body.style.cursor = "auto";
+      }
     };
   }, []);
 
@@ -195,8 +184,18 @@ export default function App({ Component, pageProps }: any) {
         />
         <Tooltip id="tooltip" className="react-tooltip" />
         <Component {...pageProps} />
+        <div
+          ref={selectionBoxRef}
+          className="selection-box"
+          style={{
+            position: "absolute",
+            width: "100px",
+            height: "100px",
+            border: "2px solid red",
+            pointerEvents: "none",
+          }}
+        />
       </Layout>
-      <FocusBox />
       <GoogleAnalytics gaId={GTag} />
       <Script
         disable-devtool-auto
