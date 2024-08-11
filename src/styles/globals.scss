@@ -177,7 +177,7 @@ input {
   border: 2px solid var(--ascent-color);
   background: rgba(0, 0, 0, 0.2);
   z-index: 10;
-  pointer-events: none;
+  pointer-events: none; /* Ensures it does not interfere with clicks */
 }
 
 /* Overlay */
@@ -189,5 +189,5 @@ input {
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   z-index: 9;
-  pointer-events: auto;
+  pointer-events: auto; /* Allows clicks on the overlay */
 }
