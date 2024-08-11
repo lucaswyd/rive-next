@@ -25,25 +25,6 @@
   }
 }
 
-.dark {
-  --bg-color: rgb(27, 25, 25);
-  --bg-gradient: rgba(49, 47, 47, 0.8);
-  --primary-1: black;
-  --primary-2: rgb(87, 107, 135);
-  --primary-3: rgb(164, 179, 201);
-  --primary-4: white;
-  --watchPageBtn: var(--primary-3);
-}
-.light {
-  --bg-color: #f4f7fe;
-  --bg-gradient: rgba(238, 235, 235, 0.8);
-  --primary-1: rgb(255, 255, 255);
-  --primary-2: #64748b;
-  --primary-3: #52525b;
-  --primary-4: black;
-  --watchPageBtn: var(--primary-1);
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -143,16 +124,17 @@ input {
 .react-tooltip,
 .tooltip {
   background-color: var(--bg-gradient) !important;
+  background: var(--bg-gradient) !important;
   color: var(--primary-3) !important;
   border-radius: 0.3rem !important;
   z-index: 5;
   border: 1px solid var(--bg-color);
-
   &-arrow {
     border-bottom: 1px solid var(--bg-color);
     border-right: 1px solid var(--bg-color);
   }
 }
+
 .tooltip-btn {
   padding: 0.2rem 0.5rem;
   border-radius: 0.3rem;
@@ -184,6 +166,26 @@ input {
   z-index: 2;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 999; /* Ensure the overlay is on top */
+  pointer-events: none; /* Allow mouse interactions to pass through */
+}
+
+.selection-box {
+  position: absolute;
+  border: 2px solid var(--ascent-color);
+  background: rgba(255, 215, 0, 0.2); /* Gold with transparency */
+  pointer-events: none; /* Prevent the box from blocking interactions */
+  z-index: 998; /* Ensure the selection box is below the overlay */
+  transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+
 @media (max-width: 769px) {
   * {
     font-size: 0.9rem;
@@ -207,21 +209,26 @@ input {
   }
 }
 
-.invisible-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  z-index: 9999;
-  pointer-events: all;
-}
-
-.selection-box {
-  position: absolute;
-  border: 2px solid var(--ascent-color);
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
-  z-index: 1000;
-  pointer-events: none;
+/* Removing some common ads using classes */
+.ad,
+.advertisement,
+.ad-banner,
+.ad-box,
+.ad-container,
+.ad-frame,
+.ad-widget,
+.ad-unit,
+.ad-slot,
+.ad-wrapper,
+.ad-rectangle,
+.ad-square,
+.ad-inline,
+.ad-sidebar,
+.ad-header,
+.ad-footer,
+.ad-leaderboard,
+.ad-skyscraper,
+.ad-block,
+.ad-label {
+  display: none !important;
 }
