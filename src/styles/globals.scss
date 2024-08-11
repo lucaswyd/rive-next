@@ -12,7 +12,6 @@
     --watchPageBtn: var(--primary-3);
   }
 }
-
 @media (prefers-color-scheme: light) {
   :root {
     --ascent-color: gold;
@@ -35,7 +34,6 @@
   --primary-4: white;
   --watchPageBtn: var(--primary-3);
 }
-
 .light {
   --bg-color: #f4f7fe;
   --bg-gradient: rgba(238, 235, 235, 0.8);
@@ -53,14 +51,11 @@
   font-family: "Roboto Mono", serif;
   user-select: none;
   scroll-behavior: smooth;
-  cursor: none; /* Hide the cursor */
 }
-
 a {
   text-decoration: none;
   color: var(--primary-2);
 }
-
 .react-loading-skeleton {
   --base-color: var(--primary-1) !important;
   --highlight-color: var(--bg-color) !important;
@@ -152,12 +147,12 @@ input {
   border-radius: 0.3rem !important;
   z-index: 5;
   border: 1px solid var(--bg-color);
+
   &-arrow {
     border-bottom: 1px solid var(--bg-color);
     border-right: 1px solid var(--bg-color);
   }
 }
-
 .tooltip-btn {
   padding: 0.2rem 0.5rem;
   border-radius: 0.3rem;
@@ -193,15 +188,12 @@ input {
   * {
     font-size: 0.9rem;
   }
-
   h1 {
     font-size: 1.2rem;
   }
-
   :not(h1) {
     letter-spacing: -0.5px;
   }
-
   .react-tooltip,
   .tooltip {
     display: none;
@@ -210,53 +202,26 @@ input {
   .sooner-toast-mobile {
     display: flex;
   }
-
   .sooner-toast-desktop {
     display: none;
   }
 }
 
-.ad,
-.advertisement,
-.ad-banner,
-.ad-box,
-.ad-container,
-.ad-frame,
-.ad-widget,
-.ad-unit,
-.ad-slot,
-.ad-wrapper,
-.ad-rectangle,
-.ad-square,
-.ad-inline,
-.ad-sidebar,
-.ad-header,
-.ad-footer,
-.ad-leaderboard,
-.ad-skyscraper,
-.ad-block,
-.ad-label {
-  display: none !important;
-}
-
-/* Selection Box Styles */
-.selection-box {
-  position: absolute;
-  border: 2px solid var(--ascent-color);
-  box-shadow: 0 0 10px var(--ascent-color);
-  z-index: 9999;
-  pointer-events: none;
-  transition: top 0.1s, left 0.1s, width 0.1s, height 0.1s;
-}
-
-/* Invisible Overlay Styles */
-.overlay {
+.invisible-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: transparent;
-  z-index: 1000; /* Ensure it sits on top of all other elements */
-  pointer-events: none; /* Allow clicks to pass through the overlay */
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 9999;
+  pointer-events: all;
+}
+
+.selection-box {
+  position: absolute;
+  border: 2px solid var(--ascent-color);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+  z-index: 1000;
+  pointer-events: none;
 }
