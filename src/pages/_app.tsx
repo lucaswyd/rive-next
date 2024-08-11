@@ -23,8 +23,8 @@ export default function App({ Component, pageProps }: any) {
         const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
           selectionBoxRef.current.style.display = "block"; // Show the selection box
-          selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
-          selectionBoxRef.current.style.left = `${rect.left + window.scrollX}px`;
+          selectionBoxRef.current.style.top = `${Math.max(0, rect.top + window.scrollY)}px`;
+          selectionBoxRef.current.style.left = `${Math.max(0, rect.left + window.scrollX)}px`;
           selectionBoxRef.current.style.width = `${rect.width}px`;
           selectionBoxRef.current.style.height = `${rect.height}px`;
         }
