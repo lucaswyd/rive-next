@@ -15,11 +15,16 @@ export default function App({ Component, pageProps }: any) {
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    let elements: NodeListOf<HTMLElement> | null = document.querySelectorAll("a[href], button, input, select, textarea");
+    const updateElements = () => {
+      // Update the elements to include all focusable elements
+      return document.querySelectorAll("a[href], button, input, select, textarea");
+    };
+
+    let elements = updateElements();
     let currentIndex = 0;
 
     const updateSelectionBox = () => {
-      if (elements && elements.length > 0 && elements[currentIndex]) {
+      if (elements.length > 0 && elements[currentIndex]) {
         const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
           selectionBoxRef.current.style.display = "block"; // Show the selection box
@@ -41,11 +46,14 @@ export default function App({ Component, pageProps }: any) {
       const movementX = e.movementX;
       const movementY = e.movementY;
 
+      // Update element list if the DOM changes
+      elements = updateElements();
+
       // Adjust the detection logic for movement direction
       if (movementX > 0 || movementY > 0) {
-        currentIndex = (currentIndex + 1) % (elements?.length || 0);
+        currentIndex = (currentIndex + 1) % elements.length;
       } else if (movementX < 0 || movementY < 0) {
-        currentIndex = (currentIndex - 1 + (elements?.length || 0)) % (elements?.length || 0);
+        currentIndex = (currentIndex - 1 + elements.length) % elements.length;
       }
 
       updateSelectionBox();
