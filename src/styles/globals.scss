@@ -12,6 +12,7 @@
     --watchPageBtn: var(--primary-3);
   }
 }
+
 @media (prefers-color-scheme: light) {
   :root {
     --ascent-color: gold;
@@ -25,6 +26,26 @@
   }
 }
 
+.dark {
+  --bg-color: rgb(27, 25, 25);
+  --bg-gradient: rgba(49, 47, 47, 0.8);
+  --primary-1: black;
+  --primary-2: rgb(87, 107, 135);
+  --primary-3: rgb(164, 179, 201);
+  --primary-4: white;
+  --watchPageBtn: var(--primary-3);
+}
+
+.light {
+  --bg-color: #f4f7fe;
+  --bg-gradient: rgba(238, 235, 235, 0.8);
+  --primary-1: rgb(255, 255, 255);
+  --primary-2: #64748b;
+  --primary-3: #52525b;
+  --primary-4: black;
+  --watchPageBtn: var(--primary-1);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -33,10 +54,12 @@
   user-select: none;
   scroll-behavior: smooth;
 }
+
 a {
   text-decoration: none;
   color: var(--primary-2);
 }
+
 .react-loading-skeleton {
   --base-color: var(--primary-1) !important;
   --highlight-color: var(--bg-color) !important;
@@ -129,10 +152,6 @@ input {
   border-radius: 0.3rem !important;
   z-index: 5;
   border: 1px solid var(--bg-color);
-  &-arrow {
-    border-bottom: 1px solid var(--bg-color);
-    border-right: 1px solid var(--bg-color);
-  }
 }
 
 .tooltip-btn {
@@ -149,86 +168,4 @@ input {
   font-family: var(--SFFamily), "Roboto Mono", serif !important;
   color: var(--SFColor) !important;
   opacity: var(--SOpacity) !important;
-  background: var(--SBColor) !important;
-  backdrop-filter: blur(var(--SBBlur)) !important;
-  border-radius: 0.5rem;
-  padding: 0.3rem;
-}
-
-.modalOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background: transparent;
-  backdrop-filter: blur(0.05rem) grayscale(0.5);
-  z-index: 2;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  z-index: 999; /* Ensure the overlay is on top */
-  pointer-events: none; /* Allow mouse interactions to pass through */
-}
-
-.selection-box {
-  position: absolute;
-  border: 2px solid var(--ascent-color);
-  background: rgba(255, 215, 0, 0.2); /* Gold with transparency */
-  pointer-events: none; /* Prevent the box from blocking interactions */
-  z-index: 998; /* Ensure the selection box is below the overlay */
-  transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease;
-}
-
-@media (max-width: 769px) {
-  * {
-    font-size: 0.9rem;
-  }
-  h1 {
-    font-size: 1.2rem;
-  }
-  :not(h1) {
-    letter-spacing: -0.5px;
-  }
-  .react-tooltip,
-  .tooltip {
-    display: none;
-  }
-
-  .sooner-toast-mobile {
-    display: flex;
-  }
-  .sooner-toast-desktop {
-    display: none;
-  }
-}
-
-/* Removing some common ads using classes */
-.ad,
-.advertisement,
-.ad-banner,
-.ad-box,
-.ad-container,
-.ad-frame,
-.ad-widget,
-.ad-unit,
-.ad-slot,
-.ad-wrapper,
-.ad-rectangle,
-.ad-square,
-.ad-inline,
-.ad-sidebar,
-.ad-header,
-.ad-footer,
-.ad-leaderboard,
-.ad-skyscraper,
-.ad-block,
-.ad-label {
-  display: none !important;
-}
+  background: var(--SBColor)
