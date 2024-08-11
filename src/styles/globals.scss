@@ -207,19 +207,19 @@ input {
   padding: 0.3rem;
 }
 
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0); /* Fully transparent */
-  z-index: 9998; /* Ensure it's below the selection box */
-  pointer-events: auto; /* Allow the overlay to intercept clicks */
-}
+//.modalOverlay {
+//  position: fixed;
+//  top: 0;
+//  left: 0;
+//  width: 100%;
+//  height: 100%;
+//  background: rgba(255, 255, 255, 0); /* Fully transparent */
+//  z-index: 9998; /* Ensure it's below the selection box */
+//  pointer-events: auto; /* Allow the overlay to intercept clicks */
+//}
 
 
-/* .modalOverlay {
+ .modalOverlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -229,7 +229,6 @@ input {
   backdrop-filter: blur(0.05rem) grayscale(0.5);
   z-index: 2;
 }
-*/
 
 @media (max-width: 769px) {
   * {
