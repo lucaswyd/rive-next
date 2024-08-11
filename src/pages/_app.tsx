@@ -11,19 +11,16 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 
 export default function App({ Component, pageProps }: any) {
   const selectionBoxRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
-  const [elements, setElements] = useState<NodeListOf<HTMLElement> | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const focusableSelectors = `
-      a[href], button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])
-    `;
-    setElements(document.querySelectorAll(focusableSelectors));
+    let elements: NodeListOf<HTMLElement> | null = document.querySelectorAll("a[href], button, input, select, textarea");
+    let currentIndex = 0;
 
-    const updateSelectionBox = (index: number) => {
-      if (elements && elements.length > 0 && elements[index]) {
-        const rect = elements[index].getBoundingClientRect();
+    const updateSelectionBox = () => {
+      if (elements && elements.length > 0 && elements[currentIndex]) {
+        const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
           selectionBoxRef.current.style.display = "block"; // Show the selection box
           selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
@@ -31,7 +28,7 @@ export default function App({ Component, pageProps }: any) {
           selectionBoxRef.current.style.width = `${rect.width}px`;
           selectionBoxRef.current.style.height = `${rect.height}px`;
         }
-        setSelectedElement(elements[index]);
+        setSelectedElement(elements[currentIndex]);
       } else {
         if (selectionBoxRef.current) {
           selectionBoxRef.current.style.display = "none"; // Hide the selection box if no elements found
@@ -44,13 +41,14 @@ export default function App({ Component, pageProps }: any) {
       const movementX = e.movementX;
       const movementY = e.movementY;
 
+      // Adjust the detection logic for movement direction
       if (movementX > 0 || movementY > 0) {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % (elements?.length || 0));
+        currentIndex = (currentIndex + 1) % (elements?.length || 0);
       } else if (movementX < 0 || movementY < 0) {
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + (elements?.length || 0)) % (elements?.length || 0));
+        currentIndex = (currentIndex - 1 + (elements?.length || 0)) % (elements?.length || 0);
       }
 
-      updateSelectionBox(currentIndex);
+      updateSelectionBox();
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -58,7 +56,7 @@ export default function App({ Component, pageProps }: any) {
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [elements, currentIndex]);
+  }, []);
 
   useEffect(() => {
     Router.events.on("routeChangeStart", () => {
@@ -80,6 +78,7 @@ export default function App({ Component, pageProps }: any) {
       <Head>
         <title>Rive</title>
         <meta name="description" content="Your Personal Streaming Oasis" />
+        {/* Add other meta tags as needed */}
       </Head>
       <Layout>
         <Toaster
@@ -98,7 +97,7 @@ export default function App({ Component, pageProps }: any) {
         <Component {...pageProps} />
       </Layout>
       <div ref={selectionBoxRef} className="selection-box" />
-      <div className="overlay"></div> {/* Invisible overlay */}
+      <div ref={overlayRef} className="modalOverlay" />
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID || ""} />
     </>
   );
