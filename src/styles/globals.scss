@@ -47,141 +47,216 @@
 }
 
 * {
-  box-sizing: border-box;
-}
-
-body {
   margin: 0;
-  background-color: var(--bg-color);
-  color: var(--primary-4);
-  font-family: "Roboto Mono", monospace;
-  overflow-x: hidden;
-  transition: all 0.4s ease-in-out;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Roboto Mono", serif;
+  user-select: none;
+  scroll-behavior: smooth;
+  cursor: none; /* Hide the cursor */
 }
 
 a {
-  color: inherit;
   text-decoration: none;
-  cursor: pointer;
+  color: var(--primary-2);
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+.react-loading-skeleton {
+  --base-color: var(--primary-1) !important;
+  --highlight-color: var(--bg-color) !important;
+  display: block;
+  background-color: var(--primary-1) !important;
+  background-image: linear-gradient(
+    90deg,
+    var(--bg-color),
+    var(--primary-1),
+    var(--bg-color)
+  ) !important;
+}
+
+.skeleton {
   margin: 0;
+  padding: 0;
+  animation: skeleton-loading 1.5s linear infinite alternate;
 }
 
-main {
-  min-height: 100vh;
-  padding: 4rem 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+@keyframes skeleton-loading {
+  0% {
+    background: var(--bg-color);
+  }
+  100% {
+    background: var(--primary-1);
+  }
 }
 
 h1 {
-  margin: 0;
-  line-height: 1.15;
-  font-size: 4rem;
-  text-align: center;
+  font-family: sans-serif;
+  color: var(--primary-3);
+  font-size: 1.7rem;
 }
 
-p {
-  margin: 0;
-  text-align: center;
-  font-size: 1.5rem;
+:not(h1) {
+  letter-spacing: -1.5px;
 }
 
-code {
-  background: #eee;
-  border-radius: 5px;
-  padding: 0.75rem;
-  font-size: 1.1rem;
+input {
+  caret-color: var(--ascent-color) !important;
 }
 
-.grid {
+::-webkit-scrollbar {
+  display: none;
+}
+
+.btn {
+  background: var(--ascent-color);
+  color: var(--primary-1);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  border-radius: 0.3rem;
+  padding: 0.3rem 0.5rem;
+  gap: 0.3rem;
+  max-width: 15rem;
+}
+
+.sooner-toast,
+.sooner-toast-desktop,
+.sooner-toast-mobile {
+  background: var(--primary-1);
+  color: var(--primary-3);
+  border: 1px solid var(--primary-2);
+}
+
+.sooner-toast-mobile {
+  display: none;
+}
+
+.discordInvitation {
+  width: 100%;
+  display: flex;
   flex-wrap: wrap;
-  max-width: 800px;
-}
-
-.card {
-  margin: 1rem;
-  flex-basis: 45%;
-  padding: 1.5rem;
-  text-align: left;
-  color: inherit;
-  background-color: #1a1a1a;
-  border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  border: 1px solid #eaeaea;
-  cursor: pointer;
-}
-
-.card:hover,
-.card:focus,
-.card:active {
-  border-color: var(--ascent-color);
-}
-
-.card h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
-}
-
-.card p {
-  margin: 0;
-  font-size: 1.25rem;
-  line-height: 1.5;
-}
-
-.footer {
-  display: flex;
-  flex: 1;
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea;
-  justify-content: center;
   align-items: center;
-}
-
-.footer img {
-  margin-left: 0.5rem;
-}
-
-.footer a {
-  display: flex;
   justify-content: center;
-  align-items: center;
+  gap: 1rem;
+  color: var(--primary-3);
   text-decoration: none;
-  color: inherit;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 2.5ch;
 }
 
-.focus-box {
+.react-tooltip,
+.tooltip {
+  background-color: var(--bg-gradient) !important;
+  color: var(--primary-3) !important;
+  border-radius: 0.3rem !important;
+  z-index: 5;
+  border: 1px solid var(--bg-color);
+  &-arrow {
+    border-bottom: 1px solid var(--bg-color);
+    border-right: 1px solid var(--bg-color);
+  }
+}
+
+.tooltip-btn {
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.3rem;
+  background: var(--bg-color);
+  color: var(--primary-3);
+  border: 1px solid var(--primary-1);
+  font-size: 0.8rem;
+}
+
+.art-subtitle-line {
+  font-size: var(--SFSize) !important;
+  font-family: var(--SFFamily), "Roboto Mono", serif !important;
+  color: var(--SFColor) !important;
+  opacity: var(--SOpacity) !important;
+  background: var(--SBColor) !important;
+  backdrop-filter: blur(var(--SBBlur)) !important;
+  border-radius: 0.5rem;
+  padding: 0.3rem;
+}
+
+.modalOverlay {
   position: absolute;
-  border: 2px solid var(--ascent-color);
-  pointer-events: none;
-  z-index: 9999;
-  transition: all 0.1s ease-in-out;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: transparent;
+  backdrop-filter: blur(0.05rem) grayscale(0.5);
+  z-index: 2;
 }
 
+@media (max-width: 769px) {
+  * {
+    font-size: 0.9rem;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  :not(h1) {
+    letter-spacing: -0.5px;
+  }
+
+  .react-tooltip,
+  .tooltip {
+    display: none;
+  }
+
+  .sooner-toast-mobile {
+    display: flex;
+  }
+
+  .sooner-toast-desktop {
+    display: none;
+  }
+}
+
+.ad,
+.advertisement,
+.ad-banner,
+.ad-box,
+.ad-container,
+.ad-frame,
+.ad-widget,
+.ad-unit,
+.ad-slot,
+.ad-wrapper,
+.ad-rectangle,
+.ad-square,
+.ad-inline,
+.ad-sidebar,
+.ad-header,
+.ad-footer,
+.ad-leaderboard,
+.ad-skyscraper,
+.ad-block,
+.ad-label {
+  display: none !important;
+}
+
+/* Selection Box Styles */
 .selection-box {
   position: absolute;
-  border: 2px solid blue; // Customize the border style and color as needed
-  background: rgba(0, 0, 255, 0.2); // Semi-transparent background for visibility
-  pointer-events: none; // Prevent the selection box from blocking mouse events
-  display: none; // Hidden by default, shown when needed
+  border: 2px solid var(--ascent-color);
+  box-shadow: 0 0 10px var(--ascent-color);
+  z-index: 9999;
+  pointer-events: none;
+  transition: top 0.1s, left 0.1s, width 0.1s, height 0.1s;
 }
 
+/* Invisible Overlay Styles */
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 255, 0, 0.75); // Solid green with 75% opacity
-  z-index: 10000; // Ensure this is higher than any other z-index values
-  pointer-events: all; // Prevent interaction with underlying elements
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  z-index: 1000; /* Ensure it sits on top of all other elements */
+  pointer-events: none; /* Allow clicks to pass through the overlay */
 }
