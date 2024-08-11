@@ -14,32 +14,25 @@ export default function App({ Component, pageProps }: any) {
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    const getAllFocusableElements = () => {
-      return Array.from(
-        document.querySelectorAll<HTMLElement>(
-          "a[href], button, input, select, textarea, [tabindex]:not([tabindex='-1']), [role='button']"
-        )
-      );
-    };
-
-    let elements = getAllFocusableElements();
+    let elements: NodeListOf<HTMLElement> | null = document.querySelectorAll("a[href]");
     let currentIndex = 0;
 
+    console.log("Identified elements:", elements);
+
     const updateSelectionBox = () => {
-      if (elements.length > 0 && elements[currentIndex]) {
+      if (elements && elements.length > 0 && elements[currentIndex]) {
         const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
-          selectionBoxRef.current.style.display = "block";
+          selectionBoxRef.current.style.display = "block"; // Show the selection box
           selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
           selectionBoxRef.current.style.left = `${rect.left + window.scrollX}px`;
           selectionBoxRef.current.style.width = `${rect.width}px`;
           selectionBoxRef.current.style.height = `${rect.height}px`;
         }
         setSelectedElement(elements[currentIndex]);
-        elements[currentIndex].focus();
       } else {
         if (selectionBoxRef.current) {
-          selectionBoxRef.current.style.display = "none";
+          selectionBoxRef.current.style.display = "none"; // Hide the selection box if no elements found
         }
         setSelectedElement(null);
       }
@@ -49,10 +42,11 @@ export default function App({ Component, pageProps }: any) {
       const movementX = e.movementX;
       const movementY = e.movementY;
 
+      // Adjust the detection logic for movement direction
       if (movementX > 0 || movementY > 0) {
-        currentIndex = (currentIndex + 1) % elements.length;
+        currentIndex = (currentIndex + 1) % (elements?.length || 0);
       } else if (movementX < 0 || movementY < 0) {
-        currentIndex = (currentIndex - 1 + elements.length) % elements.length;
+        currentIndex = (currentIndex - 1 + (elements?.length || 0)) % (elements?.length || 0);
       }
 
       updateSelectionBox();
@@ -60,17 +54,8 @@ export default function App({ Component, pageProps }: any) {
 
     window.addEventListener("mousemove", handleMouseMove);
 
-    // Update elements list and selection box on DOM changes
-    const observer = new MutationObserver(() => {
-      elements = getAllFocusableElements();
-      updateSelectionBox();
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      observer.disconnect();
     };
   }, []);
 
@@ -92,28 +77,15 @@ export default function App({ Component, pageProps }: any) {
   return (
     <>
       <Head>
-        <title>Rive</title>
-        <meta name="description" content="Your Personal Streaming Oasis" />
-        {/* Add other meta tags as needed */}
+        <title>My Next.js App</title>
       </Head>
       <Layout>
-        <Toaster
-          toastOptions={{
-            className: "sooner-toast-desktop",
-          }}
-          position="bottom-right"
-        />
-        <Toaster
-          toastOptions={{
-            className: "sooner-toast-mobile",
-          }}
-          position="top-center"
-        />
-        <Tooltip id="tooltip" className="react-tooltip" />
         <Component {...pageProps} />
+        <div className="overlay"></div>
+        <div className="selection-box" ref={selectionBoxRef}></div>
+        <Toaster />
+        <Tooltip />
       </Layout>
-      <div ref={selectionBoxRef} className="selection-box" />
-      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID || ""} />
     </>
   );
 }
