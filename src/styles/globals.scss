@@ -168,5 +168,26 @@ input {
   font-family: var(--SFFamily), "Roboto Mono", serif !important;
   color: var(--SFColor) !important;
   opacity: var(--SOpacity) !important;
-  background: var(--SBColor)
+  background: var(--SBColor) !important;
+}
+
+/* Selection Box */
+.selection-box {
+  position: fixed;
+  border: 2px solid var(--ascent-color);
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9;
+  pointer-events: auto;
 }
