@@ -12,18 +12,19 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 export default function App({ Component, pageProps }: any) {
   const selectionBoxRef = useRef<HTMLDivElement>(null);
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let elements: NodeListOf<HTMLElement> | null = document.querySelectorAll("a[href]");
+    let elements: NodeListOf<HTMLElement> | null = document.querySelectorAll(
+      "a[href], button, input, select, textarea, [tabindex]"
+    );
     let currentIndex = 0;
-
-    console.log("Identified elements:", elements);
 
     const updateSelectionBox = () => {
       if (elements && elements.length > 0 && elements[currentIndex]) {
         const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
-          selectionBoxRef.current.style.display = "block"; // Show the selection box
+          selectionBoxRef.current.style.display = "block";
           selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
           selectionBoxRef.current.style.left = `${rect.left + window.scrollX}px`;
           selectionBoxRef.current.style.width = `${rect.width}px`;
@@ -32,7 +33,7 @@ export default function App({ Component, pageProps }: any) {
         setSelectedElement(elements[currentIndex]);
       } else {
         if (selectionBoxRef.current) {
-          selectionBoxRef.current.style.display = "none"; // Hide the selection box if no elements found
+          selectionBoxRef.current.style.display = "none";
         }
         setSelectedElement(null);
       }
@@ -42,7 +43,6 @@ export default function App({ Component, pageProps }: any) {
       const movementX = e.movementX;
       const movementY = e.movementY;
 
-      // Adjust the detection logic for movement direction
       if (movementX > 0 || movementY > 0) {
         currentIndex = (currentIndex + 1) % (elements?.length || 0);
       } else if (movementX < 0 || movementY < 0) {
@@ -77,15 +77,28 @@ export default function App({ Component, pageProps }: any) {
   return (
     <>
       <Head>
-        <title>My Next.js App</title>
+        <title>Rive</title>
+        <meta name="description" content="Your Personal Streaming Oasis" />
       </Head>
       <Layout>
+        <Toaster
+          toastOptions={{
+            className: "sooner-toast-desktop",
+          }}
+          position="bottom-right"
+        />
+        <Toaster
+          toastOptions={{
+            className: "sooner-toast-mobile",
+          }}
+          position="top-center"
+        />
+        <Tooltip id="tooltip" className="react-tooltip" />
         <Component {...pageProps} />
-        <div className="overlay"></div>
-        <div className="selection-box" ref={selectionBoxRef}></div>
-        <Toaster />
-        <Tooltip />
       </Layout>
+      <div ref={overlayRef} className="overlay"></div>
+      <div ref={selectionBoxRef} className="selection-box" />
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID || ""} />
     </>
   );
 }
