@@ -113,6 +113,7 @@ export default function App({ Component, pageProps }: any) {
         <Component {...pageProps} />
       </Layout>
       <div ref={selectionBoxRef} className="selection-box" />
+      <div className="modalOverlay" /> {/* Add this overlay div */}
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID || ""} />
     </>
   );
