@@ -58,7 +58,17 @@ export default function App({ Component, pageProps }: any) {
       updateSelectionBox();
     };
 
+    const handleOverlayClick = () => {
+      if (selectedElement) {
+        selectedElement.click(); // Trigger click on the selected element
+      }
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
+
+    // Add event listener for overlay clicks
+    const overlayElement = document.querySelector(".modalOverlay");
+    overlayElement?.addEventListener("click", handleOverlayClick);
 
     // Update elements list and selection box on DOM changes
     const observer = new MutationObserver(() => {
@@ -70,9 +80,10 @@ export default function App({ Component, pageProps }: any) {
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      overlayElement?.removeEventListener("click", handleOverlayClick);
       observer.disconnect();
     };
-  }, []);
+  }, [selectedElement]);
 
   useEffect(() => {
     Router.events.on("routeChangeStart", () => {
