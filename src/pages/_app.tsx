@@ -12,8 +12,6 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 export default function App({ Component, pageProps }: any) {
   const selectionBoxRef = useRef<HTMLDivElement>(null);
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
-  const [elements, setElements] = useState<HTMLElement[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const getAllFocusableElements = () => {
@@ -24,10 +22,14 @@ export default function App({ Component, pageProps }: any) {
       );
     };
 
+    let elements = getAllFocusableElements();
+    let currentIndex = 0;
+
     const updateSelectionBox = () => {
       if (elements.length > 0 && elements[currentIndex]) {
         const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
+          selectionBoxRef.current.style.display = "block";
           selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
           selectionBoxRef.current.style.left = `${rect.left + window.scrollX}px`;
           selectionBoxRef.current.style.width = `${rect.width}px`;
@@ -48,39 +50,37 @@ export default function App({ Component, pageProps }: any) {
       const movementY = e.movementY;
 
       if (movementX > 0 || movementY > 0) {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % elements.length);
+        currentIndex = (currentIndex + 1) % elements.length;
       } else if (movementX < 0 || movementY < 0) {
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + elements.length) % elements.length);
+        currentIndex = (currentIndex - 1 + elements.length) % elements.length;
       }
-    };
 
-    const handleOverlayClick = () => {
-      if (selectedElement) {
-        selectedElement.click(); // Trigger click on the selected element
-      }
+      updateSelectionBox();
     };
 
     window.addEventListener("mousemove", handleMouseMove);
 
-    // Add event listener for overlay clicks
-    const overlayElement = document.querySelector(".modalOverlay");
-    overlayElement?.addEventListener("click", handleOverlayClick);
-
     // Update elements list and selection box on DOM changes
     const observer = new MutationObserver(() => {
-      const newElements = getAllFocusableElements();
-      setElements(newElements);
+      elements = getAllFocusableElements();
       updateSelectionBox();
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
 
+    // Handle clicks on the overlay
+    const handleOverlayClick = () => {
+      selectedElement?.click();
+    };
+
+    document.querySelector(".modalOverlay")?.addEventListener("click", handleOverlayClick);
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      overlayElement?.removeEventListener("click", handleOverlayClick);
       observer.disconnect();
+      document.querySelector(".modalOverlay")?.removeEventListener("click", handleOverlayClick);
     };
-  }, [currentIndex, elements]);
+  }, [selectedElement]);
 
   useEffect(() => {
     Router.events.on("routeChangeStart", () => {
@@ -121,7 +121,7 @@ export default function App({ Component, pageProps }: any) {
         <Component {...pageProps} />
       </Layout>
       <div ref={selectionBoxRef} className="selection-box" />
-      <div className="modalOverlay" /> {/* Add this overlay div */}
+      <div className="modalOverlay" /> {/* Overlay to handle clicks */}
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GT_MEASUREMENT_ID || ""} />
     </>
   );
