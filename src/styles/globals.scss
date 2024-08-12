@@ -174,53 +174,39 @@ input {
 }
 
 .modalOverlay {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
   width: 100%;
-  background: rgba(0, 0, 0, 0.75); /* Semi-transparent black */
-  z-index: 2;
-  pointer-events: auto; /* Allow clicks on the overlay */
-}
-
-.selection-box {
-  position: absolute;
-  background: rgba(0, 0, 255, 0.2); /* Adjust color as needed */
-  border: 2px solid rgba(0, 0, 255, 0.5); /* Adjust color as needed */
-  transition: all 0.3s ease; /* Smooth transition */
-  pointer-events: none; /* Ensure it doesn't block interactions */
-  z-index: 9998; /* Ensure it's below the overlay */
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75); /* 75% opacity */
+  z-index: 9999; /* Ensure it's on top */
+  pointer-events: auto; /* Ensure it captures clicks */
 }
 
 @media (max-width: 769px) {
   * {
     font-size: 0.9rem;
   }
-
   h1 {
     font-size: 1.2rem;
   }
-
   :not(h1) {
     letter-spacing: -0.5px;
   }
-
   .react-tooltip,
   .tooltip {
     display: none;
   }
-
   .sooner-toast-mobile {
     display: flex;
   }
-
   .sooner-toast-desktop {
     display: none;
   }
 }
 
-// Removing some common ads using classes
+// Removing common ads using classes
 .ad,
 .advertisement,
 .ad-banner,
