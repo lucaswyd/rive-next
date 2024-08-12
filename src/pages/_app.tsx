@@ -87,8 +87,8 @@ export default function App({ Component, pageProps }: any) {
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      observer.disconnect();
       document.querySelector(".modalOverlay")?.removeEventListener("click", handleOverlayClick);
+      observer.disconnect();
     };
   }, [handleMouseMove, updateSelectionBox]);
 
