@@ -45,7 +45,12 @@ export default function App({ Component, pageProps }: any) {
       }
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (() => {
+  let timer: NodeJS.Timeout | null = null;
+  return (e: MouseEvent) => {
+    if (timer) clearTimeout(timer);
+
+    timer = setTimeout(() => {
       const movementX = e.movementX;
       const movementY = e.movementY;
 
@@ -56,7 +61,10 @@ export default function App({ Component, pageProps }: any) {
       }
 
       updateSelectionBox();
-    };
+    }, 50); // Adjust the debounce delay as needed
+  };
+})();
+
 
     window.addEventListener("mousemove", handleMouseMove);
 
