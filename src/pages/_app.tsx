@@ -30,10 +30,10 @@ export default function App({ Component, pageProps }: any) {
         const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
           selectionBoxRef.current.style.display = "block";
-          selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
-          selectionBoxRef.current.style.left = `${rect.left + window.scrollX}px`;
-          selectionBoxRef.current.style.width = `${rect.width}px`;
-          selectionBoxRef.current.style.height = `${rect.height}px`;
+          selectionBoxRef.current.style.top = ${rect.top + window.scrollY}px;
+          selectionBoxRef.current.style.left = ${rect.left + window.scrollX}px;
+          selectionBoxRef.current.style.width = ${rect.width}px;
+          selectionBoxRef.current.style.height = ${rect.height}px;
         }
         setSelectedElement(elements[currentIndex]);
         elements[currentIndex].focus();
