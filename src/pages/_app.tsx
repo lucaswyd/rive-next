@@ -12,6 +12,8 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 export default function App({ Component, pageProps }: any) {
   const selectionBoxRef = useRef<HTMLDivElement>(null);
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
+  const [elements, setElements] = useState<HTMLElement[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const getAllFocusableElements = () => {
@@ -22,14 +24,10 @@ export default function App({ Component, pageProps }: any) {
       );
     };
 
-    let elements = getAllFocusableElements();
-    let currentIndex = 0;
-
     const updateSelectionBox = () => {
       if (elements.length > 0 && elements[currentIndex]) {
         const rect = elements[currentIndex].getBoundingClientRect();
         if (selectionBoxRef.current) {
-          selectionBoxRef.current.style.display = "block";
           selectionBoxRef.current.style.top = `${rect.top + window.scrollY}px`;
           selectionBoxRef.current.style.left = `${rect.left + window.scrollX}px`;
           selectionBoxRef.current.style.width = `${rect.width}px`;
@@ -50,12 +48,10 @@ export default function App({ Component, pageProps }: any) {
       const movementY = e.movementY;
 
       if (movementX > 0 || movementY > 0) {
-        currentIndex = (currentIndex + 1) % elements.length;
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % elements.length);
       } else if (movementX < 0 || movementY < 0) {
-        currentIndex = (currentIndex - 1 + elements.length) % elements.length;
+        setCurrentIndex((prevIndex) => (prevIndex - 1 + elements.length) % elements.length);
       }
-
-      updateSelectionBox();
     };
 
     const handleOverlayClick = () => {
@@ -72,7 +68,8 @@ export default function App({ Component, pageProps }: any) {
 
     // Update elements list and selection box on DOM changes
     const observer = new MutationObserver(() => {
-      elements = getAllFocusableElements();
+      const newElements = getAllFocusableElements();
+      setElements(newElements);
       updateSelectionBox();
     });
 
@@ -83,7 +80,7 @@ export default function App({ Component, pageProps }: any) {
       overlayElement?.removeEventListener("click", handleOverlayClick);
       observer.disconnect();
     };
-  }, [selectedElement]);
+  }, [currentIndex, elements]);
 
   useEffect(() => {
     Router.events.on("routeChangeStart", () => {
