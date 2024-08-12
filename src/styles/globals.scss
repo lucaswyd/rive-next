@@ -1,4 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100..700&display=swap");
+// :root{
+//   --ascent-color:gold;
+//   --bg-color:rgb(27, 25, 25);
+//   --bg-gradient:rgba(49, 47, 47,0.7);
+//   --primary-1:black;
+//   --primary-2:rgb(87, 107, 135);
+//   --primary-3:rgb(164, 179, 201);
+//   --primary-4:white;
+// }
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -12,7 +21,6 @@
     --watchPageBtn: var(--primary-3);
   }
 }
-
 @media (prefers-color-scheme: light) {
   :root {
     --ascent-color: gold;
@@ -27,6 +35,7 @@
 }
 
 .dark {
+  // --ascent-color:gold;
   --bg-color: rgb(27, 25, 25);
   --bg-gradient: rgba(49, 47, 47, 0.8);
   --primary-1: black;
@@ -35,8 +44,8 @@
   --primary-4: white;
   --watchPageBtn: var(--primary-3);
 }
-
 .light {
+  // --ascent-color:gold;
   --bg-color: #f4f7fe;
   --bg-gradient: rgba(238, 235, 235, 0.8);
   --primary-1: rgb(255, 255, 255);
@@ -46,6 +55,16 @@
   --watchPageBtn: var(--primary-1);
 }
 
+// :root{
+//   --ascent-color:gold;
+//   --bg-color:rgba(27, 25, 25,0.1);
+//   --bg-gradient:rgba(49, 47, 47,0.7);
+//   --primary-1:rgba(0,0,0,0.2);
+//   --primary-2:rgb(87, 107, 135);
+//   --primary-3:rgb(27, 41, 61);
+//   --primary-4:white;
+// }
+
 * {
   margin: 0;
   padding: 0;
@@ -54,12 +73,10 @@
   user-select: none;
   scroll-behavior: smooth;
 }
-
 a {
   text-decoration: none;
   color: var(--primary-2);
 }
-
 .react-loading-skeleton {
   --base-color: var(--primary-1) !important;
   --highlight-color: var(--bg-color) !important;
@@ -71,11 +88,16 @@ a {
     var(--primary-1),
     var(--bg-color)
   ) !important;
+  // border: 1px solid var(--bg-gradient);
+  // border-radius: 1rem;
 }
 
 .skeleton {
+  // width: 100%;
+  // height: 100%;
   margin: 0;
   padding: 0;
+  // opacity: 0.7;
   animation: skeleton-loading 1.5s linear infinite alternate;
 }
 
@@ -85,6 +107,7 @@ a {
   }
   100% {
     background: var(--primary-1);
+    // opacity: 0.1;
   }
 }
 
@@ -101,6 +124,9 @@ h1 {
 input {
   caret-color: var(--ascent-color) !important;
 }
+// select{
+//   cursor: pointer;
+// }
 
 ::-webkit-scrollbar {
   display: none;
@@ -130,6 +156,7 @@ input {
   display: none;
 }
 
+// discord Invitation
 .discordInvitation {
   width: 100%;
   display: flex;
@@ -143,16 +170,22 @@ input {
   overflow: hidden;
   height: 2.5ch;
 }
+// discord Invitation
 
 .react-tooltip,
 .tooltip {
   background-color: var(--bg-gradient) !important;
+  background: var(--bg-gradient) !important;
   color: var(--primary-3) !important;
   border-radius: 0.3rem !important;
   z-index: 5;
   border: 1px solid var(--bg-color);
+  // border: 1px solid var(--bg-gradient);
+  &-arrow {
+    border-bottom: 1px solid var(--bg-color);
+    border-right: 1px solid var(--bg-color);
+  }
 }
-
 .tooltip-btn {
   padding: 0.2rem 0.5rem;
   border-radius: 0.3rem;
@@ -162,6 +195,7 @@ input {
   font-size: 0.8rem;
 }
 
+// subtitle
 .art-subtitle-line {
   font-size: var(--SFSize) !important;
   font-family: var(--SFFamily), "Roboto Mono", serif !important;
@@ -173,8 +207,20 @@ input {
   padding: 0.3rem;
 }
 
+//.modalOverlay {
+//  position: fixed;
+//  top: 0;
+//  left: 0;
+//  width: 100%;
+//  height: 100%;
+//  background: rgba(255, 255, 255, 0); /* Fully transparent */
+//  z-index: 9998; /* Ensure it's below the selection box */
+//  pointer-events: auto; /* Allow the overlay to intercept clicks */
+//}
+
+
 .modalOverlay {
-  position: fixed;
+  position: fixed; /* Ensure it's fixed to cover the viewport */
   top: 0;
   left: 0;
   width: 100%;
@@ -183,6 +229,7 @@ input {
   z-index: 9999; /* Ensure it's on top */
   pointer-events: auto; /* Ensure it captures clicks */
 }
+
 
 @media (max-width: 769px) {
   * {
@@ -198,6 +245,7 @@ input {
   .tooltip {
     display: none;
   }
+
   .sooner-toast-mobile {
     display: flex;
   }
@@ -206,7 +254,7 @@ input {
   }
 }
 
-// Removing common ads using classes
+// reomving some common ads using classes
 .ad,
 .advertisement,
 .ad-banner,
